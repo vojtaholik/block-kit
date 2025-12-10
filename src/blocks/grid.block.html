@@ -1,0 +1,19 @@
+<section
+  class=""
+  data-block-id="{{ addr.blockId }}"
+  data-schema-address="{{ encodeSchemaAddress(addr) }}"
+>
+  <div class="container container--wide">
+    <div
+      :class="`grid${props.columns !== 'auto' ? ` grid--${props.columns}` : ''}`"
+    >
+      <template v-for="item, i in props.items">
+        <render-slot
+          :block="props.itemBlock"
+          :props="item"
+          :prop-path="`props.items[${i}]`"
+        ></render-slot>
+      </template>
+    </div>
+  </div>
+</section>

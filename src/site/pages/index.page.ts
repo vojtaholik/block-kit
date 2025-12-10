@@ -46,9 +46,174 @@ export const indexPage: PageConfig = {
             headline: "Elegantní řešení",
             body: "<p>Jednokřídlé stavební pouzdro uplatníte při nové výstavbě či rekonstrukci. Je vhodné do obývacího pokoje, ložnice, kuchyně, komory, šatny, koupelny, toalety nebo pracovny.</p>",
           },
-          // TODO: Add ability to have children within a block which calls another children, this way we can have a section as parent with different elements as children.
           layout: {
             contentAlign: "left",
+          },
+        },
+        {
+          id: "grid-1",
+          type: "grid",
+          props: {
+            itemBlock: "teaser",
+            columns: "5",
+            items: [
+              {
+                title: "Stavební pouzdra",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser1.jpg",
+                  alt: "Stavební pouzdra",
+                },
+                link: {
+                  href: "/stavebni-pouzdra",
+                  label: "Stavební pouzdra",
+                },
+              },
+              {
+                title: "Půdní schody",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser2.jpg",
+                  alt: "Půdní schody",
+                },
+                link: {
+                  href: "/pudni-schody",
+                  label: "Půdní schody",
+                },
+              },
+              {
+                title: "Zárubně",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser3.jpg",
+                  alt: "Zárubně",
+                },
+                link: {
+                  href: "/zarubne",
+                  label: "Zárubně",
+                },
+              },
+              {
+                title: "Dveře",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser4.jpg",
+                  alt: "Dveře",
+                },
+                link: {
+                  href: "/dvere",
+                  label: "Dveře",
+                },
+              },
+              {
+                title: "Posuvy",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser5.jpg",
+                  alt: "Posuvy",
+                },
+                link: {
+                  href: "/posuvy",
+                  label: "Posuvy",
+                },
+              },
+              {
+                title: "Skleněné stěny",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser6.jpg",
+                  alt: "Skleněné stěny",
+                },
+                link: {
+                  href: "/sklenene-steny",
+                  label: "Skleněné stěny",
+                },
+              },
+              {
+                title: "Grafosklo",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser7.jpg",
+                  alt: "Grafosklo",
+                },
+                link: {
+                  href: "/grafosklo",
+                  label: "Grafosklo",
+                },
+              },
+              {
+                title: "Obkladové systémy",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser8.jpg",
+                  alt: "Obkladové systémy",
+                },
+                link: {
+                  href: "/obkladove-systemy",
+                  label: "Obkladové systémy",
+                },
+              },
+              {
+                title: "Schodiště",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser9.jpg",
+                  alt: "Schodiště",
+                },
+                link: {
+                  href: "/schodiste",
+                  label: "Schodiště",
+                },
+              },
+              {
+                title: "Soklové lišty",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser10.jpg",
+                  alt: "Soklové lišty",
+                },
+                link: {
+                  href: "/soklove-listy",
+                  label: "Soklové lišty",
+                },
+              },
+              {
+                title: "Zábradlí",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser11.jpg",
+                  alt: "Zábradlí",
+                },
+                link: {
+                  href: "/zabradli",
+                  label: "Zábradlí",
+                },
+              },
+              {
+                title: "Stříšky",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser12.jpg",
+                  alt: "Stříšky",
+                },
+                link: {
+                  href: "/strisky",
+                  label: "Stříšky",
+                },
+              },
+              {
+                title: "Vchodový systém",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser1.jpg",
+                  alt: "Vchodový systém",
+                },
+                link: {
+                  href: "/vchodovy-system",
+                  label: "Vchodový systém",
+                },
+              },
+            ],
           },
         },
         {

@@ -1,5 +1,5 @@
 <section
-  class="section"
+  class="section section--{{ ctx.layout.contentAlign }}"
   data-block-id="{{ addr.blockId }}"
   data-schema-address="{{ encodeSchemaAddress(addr) }}"
 >
@@ -9,11 +9,15 @@
         <h2 class="h2">{{ props.headline }}</h2>
       </template>
       <div class="prose" v-if="props.body">{{{ props.body }}}</div>
-      <template v-if="props.cta">
+      <template v-if="props.image">
         <div class="text-section__cta">
-          <a class="btn btn--primary" :href="props.cta.href">
-            {{ props.cta.label }}
-          </a>
+          <img
+            :src="props.image.src"
+            :alt="props.image.alt"
+            width="100%"
+            height="auto"
+            loading="lazy"
+          />
         </div>
       </template>
     </div>

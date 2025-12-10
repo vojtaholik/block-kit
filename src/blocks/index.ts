@@ -15,6 +15,12 @@ export {
   sectionHeaderPropsSchema,
   type SectionHeaderProps,
 } from "./section-header.block.ts";
+export { gridBlock, gridPropsSchema, type GridProps } from "./grid.block.ts";
+export {
+  teaserBlock,
+  teaserPropsSchema,
+  type TeaserProps,
+} from "./teaser.block.ts";
 
 // Register all blocks
 import { blockRegistry } from "@static-block-kit/core";
@@ -22,10 +28,14 @@ import { heroBlock } from "./hero.block.ts";
 import { featureGridBlock } from "./feature-grid.block.ts";
 import { latestPostsBlock } from "./latest-posts.block.ts";
 import { sectionHeaderBlock } from "./section-header.block.ts";
+import { gridBlock } from "./grid.block.ts";
+import { teaserBlock } from "./teaser.block.ts";
 
 export function registerAllBlocks() {
   blockRegistry.register(heroBlock);
   blockRegistry.register(featureGridBlock);
   blockRegistry.register(latestPostsBlock);
   blockRegistry.register(sectionHeaderBlock);
+  blockRegistry.register(gridBlock);
+  blockRegistry.register(teaserBlock);
 }
