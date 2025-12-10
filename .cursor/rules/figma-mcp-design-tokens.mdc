@@ -1,0 +1,241 @@
+---
+description: Rules for extracting design tokens from Figma using MCP
+globs: "*.css, src/styles/**"
+alwaysApply: false
+---
+
+# Figma MCP Design Token Extraction
+
+When using Figma MCP (`get_variable_defs`, `get_design_context`) to extract design tokens, follow these conventions to maintain a consistent, modern CSS custom property system.
+
+## Token Naming Convention
+
+Map Figma variable collections to CSS custom property namespaces:
+
+| Figma Collection       | CSS Prefix        | Example                   |
+| ---------------------- | ----------------- | ------------------------- |
+| `Color / Background`   | `--color-bg-*`    | `--color-bg-raised`       |
+| `Color / Text`         | `--color-text-*`  | `--color-text-muted`      |
+| `Color / Brand`        | `--color-*`       | `--color-primary`         |
+| `Color / Border`       | `--color-border*` | `--color-border-inverted` |
+| `Spacing`              | `--space-*`       | `--space-4`               |
+| `Typography / Size`    | `--text-*`        | `--text-lg`               |
+| `Typography / Leading` | `--leading-*`     | `--leading-tight`         |
+| `Typography / Font`    | `--font-*`        | `--font-sans`             |
+| `Radius`               | `--radius-*`      | `--radius-md`             |
+| `Shadow`               | `--shadow-*`      | `--shadow-lg`             |
+| `Transition`           | `--transition-*`  | `--transition-fast`       |
+| `Container`            | `--container-*`   | `--container-narrow`      |
+
+## Figma Variable → CSS Value Rules
+
+### Colors
+
+- Extract raw hex/rgba from Figma, **never** use Figma's variable syntax in output
+- Use 8-character hex for alpha (`#ffffff1a`) instead of `rgba()` when alpha < 1
+- Semantic names only - no `--color-blue-500` bullshit, use `--color-primary`
+
+```css
+/* ✓ Good */
+--color-primary: #6366f1;
+--color-bg-accent: #1a1a2e;
+
+/* ✗ Bad - palette names leak implementation */
+--color-indigo-500: #6366f1;
+--blue: #6366f1;
+```
+
+### Spacing
+
+- Use numeric scale: `--space-1` through `--space-24`
+- Values in `rem`, base unit is `0.25rem` (4px at default font size)
+- Map Figma's spacing variables directly to scale
+
+```css
+/* Scale reference */
+--space-1: 0.25rem; /* 4px */
+--space-2: 0.5rem; /* 8px */
+--space-3: 0.75rem; /* 12px */
+--space-4: 1rem; /* 16px */
+--space-6: 1.5rem; /* 24px */
+--space-8: 2rem; /* 32px */
+--space-12: 3rem; /* 48px */
+--space-16: 4rem; /* 64px */
+--space-20: 5rem; /* 80px */
+--space-24: 6rem; /* 96px */
+```
+
+### Typography
+
+- Size scale: `xs`, `sm`, `base`, `lg`, `xl`, `2xl`, `3xl`, `4xl`, `5xl`
+- Line-height: semantic names (`tight`, `normal`, `relaxed`)
+- Font families: `sans`, `mono`, `serif` if needed
+
+```css
+--text-base: 1rem;
+--text-lg: 1.125rem;
+--leading-tight: 1.25;
+--leading-normal: 1.5;
+```
+
+### Radius & Shadows
+
+- Radius: `sm`, `md`, `lg`, `xl`, `full`
+- Shadows: `sm`, `md`, `lg`, `xl`
+- Use shorthand hex for shadow colors: `#0000001a` not `rgba(0, 0, 0, 0.1)`
+
+### Transitions
+
+- Duration tokens: `fast` (150ms), `base` (200ms), `slow` (300ms)
+- Include easing in the token value
+
+```css
+--transition-fast: 0.15s ease;
+--transition-base: 0.2s ease;
+```
+
+## Extraction Workflow
+
+### 1. Get Variables from Figma
+
+```
+Use get_variable_defs to fetch all variables for the selected node/file
+```
+
+### 2. Map to CSS Structure
+
+Organize in `:root` block, grouped by category:
+
+```css
+:root {
+  /* Colors - Background */
+  --color-bg: #fff;
+  --color-bg-raised: #f8f9fa;
+  --color-bg-accent: #1a1a2e;
+
+  /* Colors - Text */
+  --color-text: #1a1a2e;
+  --color-text-muted: #6c757d;
+
+  /* Colors - Brand */
+  --color-primary: #6366f1;
+  --color-primary-hover: #4f46e5;
+
+  /* Typography */
+  --font-sans: system-ui, -apple-system, /* ... */;
+  --text-base: 1rem;
+  --leading-normal: 1.5;
+
+  /* Spacing */
+  --space-4: 1rem;
+
+  /* ... */
+}
+```
+
+### 3. Handle Modes/Themes
+
+Figma variable modes → CSS attribute selectors or media queries:
+
+```css
+/* Figma mode: "Dark" */
+[data-theme="dark"] {
+  --color-bg: #0f0f1a;
+  --color-text: #fff;
+}
+
+/* Figma mode: "Compact" */
+[data-density="compact"] {
+  --section-padding-y: var(--space-8);
+}
+
+/* Motion preference mode */
+@media (prefers-reduced-motion: reduce) {
+  --transition-fast: 0s;
+  --transition-base: 0s;
+}
+```
+
+## Anti-Patterns to Avoid
+
+### Don't extract raw pixel values
+
+```css
+/* ✗ */
+--hero-padding: 96px;
+
+/* ✓ Use composition */
+--hero-padding: var(--space-24);
+```
+
+### Don't create one-off tokens
+
+```css
+/* ✗ */
+--card-border-color-hover-dark-mode: #374151;
+
+/* ✓ Use semantic, composable tokens */
+--color-border-inverted: #374151;
+```
+
+### Don't duplicate Figma's internal naming
+
+```css
+/* ✗ Figma collection path leak */
+--primitives-colors-gray-100: #f8f9fa;
+
+/* ✓ Semantic */
+--color-bg-raised: #f8f9fa;
+```
+
+### Don't use CSS color functions for simple values
+
+```css
+/* ✗ Over-engineered */
+--color-text-muted: color-mix(in srgb, var(--color-text) 60%, transparent);
+
+/* ✓ Just use the damn value */
+--color-text-muted: #6c757d;
+```
+
+## Validation Checklist
+
+Before adding extracted tokens:
+
+- [ ] All tokens use semantic naming (purpose, not appearance)
+- [ ] Colors use hex (8-char for alpha), not `rgba()` or `hsl()`
+- [ ] Spacing uses the established numeric scale
+- [ ] No duplicate values under different names
+- [ ] Tokens are grouped logically with comments
+- [ ] Mode variations use `[data-*]` selectors, not separate files
+- [ ] No raw Figma variable references leaked into CSS
+
+## Figma → CSS Quick Reference
+
+| Figma Variable Type | CSS Output Format          |
+| ------------------- | -------------------------- |
+| Color (solid)       | `#rrggbb`                  |
+| Color (with alpha)  | `#rrggbbaa`                |
+| Number (spacing)    | `{n * 0.25}rem`            |
+| Number (font-size)  | `{n / 16}rem`              |
+| String (font)       | Font stack string          |
+| Boolean             | N/A (use for conditionals) |
+| Alias               | `var(--referenced-token)`  |
+
+## Integration with Blocks
+
+When extracting tokens for a specific block:
+
+1. Check if token already exists in `:root`
+2. If yes, reference existing token
+3. If no, add to appropriate category in `:root`
+4. **Never** define block-scoped tokens in component CSS - all tokens live in `:root`
+
+Exception: Computed/contextual values that derive from tokens:
+
+```css
+.section {
+  /* This is fine - it references tokens, not defines them */
+  padding: var(--section-padding-y, var(--space-16)) 0;
+}
+```

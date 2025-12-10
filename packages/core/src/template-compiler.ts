@@ -48,7 +48,9 @@ export interface CompileOptions {
 /**
  * Compile all block templates in a directory
  */
-export async function compileBlockTemplates(options: CompileOptions): Promise<void> {
+export async function compileBlockTemplates(
+  options: CompileOptions
+): Promise<void> {
   const { blocksDir, coreImportPath = "@static-block-kit/core" } = options;
   const genDir = options.genDir ?? join(blocksDir, "gen");
 
@@ -100,7 +102,11 @@ export async function compileTemplateFile(
   coreImportPath = "@static-block-kit/core"
 ): Promise<string> {
   const content = await Bun.file(filePath).text();
-  return compileTemplate(content, basename(filePath, ".block.html"), coreImportPath);
+  return compileTemplate(
+    content,
+    basename(filePath, ".block.html"),
+    coreImportPath
+  );
 }
 
 /**
@@ -149,17 +155,11 @@ function compileNodes(nodes: Node[], indent: number): string {
  * Compile a single node
  */
 function compileNode(node: Node, indent: number): string {
-  const pad = "  ".repeat(indent);
-
   // Text node
   if (node.nodeName === "#text") {
     const text = node.value || "";
-    // Skip whitespace-only text nodes
+    // Skip whitespace-only text nodes entirely
     if (!text.trim()) {
-      // Preserve some whitespace for formatting
-      if (text.includes("\n")) {
-        return `${pad}out += "\\n";\n`;
-      }
       return "";
     }
     return compileTextWithInterpolation(text, indent);
@@ -231,7 +231,9 @@ function compileElement(element: Element, indent: number): string {
       code += compileAttrWithInterpolation(attr.name, attr.value, indent);
     } else {
       // Static attribute
-      code += `${pad}out += " ${attr.name}=\\"${escapeStringLiteral(attr.value)}\\"";\n`;
+      code += `${pad}out += " ${attr.name}=\\"${escapeStringLiteral(
+        attr.value
+      )}\\"";\n`;
     }
   }
 
@@ -245,8 +247,20 @@ function compileElement(element: Element, indent: number): string {
 
   // Self-closing tags
   const voidElements = [
-    "area", "base", "br", "col", "embed", "hr", "img", "input",
-    "link", "meta", "param", "source", "track", "wbr"
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "track",
+    "wbr",
   ];
 
   if (voidElements.includes(tagName)) {
@@ -279,7 +293,11 @@ function getChildren(element: Element): Node[] {
 /**
  * Compile v-if directive
  */
-function compileVIf(element: Element, condition: string, indent: number): string {
+function compileVIf(
+  element: Element,
+  condition: string,
+  indent: number
+): string {
   const pad = "  ".repeat(indent);
   let code = "";
 
@@ -323,7 +341,9 @@ function compileVFor(element: Element, expr: string, indent: number): string {
   let code = "";
 
   // Parse v-for expression
-  const match = expr.match(/^\s*(?:\(?\s*(\w+)\s*(?:,\s*(\w+))?\s*\)?)\s+in\s+(.+)\s*$/);
+  const match = expr.match(
+    /^\s*(?:\(?\s*(\w+)\s*(?:,\s*(\w+))?\s*\)?)\s+in\s+(.+)\s*$/
+  );
   if (!match) {
     throw new Error(`Invalid v-for expression: ${expr}`);
   }
@@ -362,6 +382,7 @@ function compileVFor(element: Element, expr: string, indent: number): string {
 
 /**
  * Compile text with {{ interpolation }} and {{{ raw }}}
+ * Normalizes whitespace: trims edges and collapses internal whitespace to single spaces
  */
 function compileTextWithInterpolation(text: string, indent: number): string {
   const pad = "  ".repeat(indent);
@@ -371,7 +392,8 @@ function compileTextWithInterpolation(text: string, indent: number): string {
   // Order matters: match triple braces first
   const parts = text.split(/(\{\{\{.+?\}\}\}|\{\{.+?\}\})/g);
 
-  for (const part of parts) {
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
     if (!part) continue;
 
     // Check for triple braces (raw output)
@@ -388,8 +410,23 @@ function compileTextWithInterpolation(text: string, indent: number): string {
       continue;
     }
 
-    // Static text
-    const escaped = escapeStringLiteral(part);
+    // Static text - normalize whitespace
+    let normalized = part;
+
+    // Trim leading whitespace if this is the first part
+    if (i === 0) {
+      normalized = normalized.replace(/^\s+/, "");
+    }
+
+    // Trim trailing whitespace if this is the last part
+    if (i === parts.length - 1) {
+      normalized = normalized.replace(/\s+$/, "");
+    }
+
+    // Collapse internal whitespace (newlines, multiple spaces) to single space
+    normalized = normalized.replace(/\s+/g, " ");
+
+    const escaped = escapeStringLiteral(normalized);
     if (escaped) {
       code += `${pad}out += "${escaped}";\n`;
     }
@@ -401,7 +438,11 @@ function compileTextWithInterpolation(text: string, indent: number): string {
 /**
  * Compile attribute with interpolation
  */
-function compileAttrWithInterpolation(name: string, value: string, indent: number): string {
+function compileAttrWithInterpolation(
+  name: string,
+  value: string,
+  indent: number
+): string {
   const pad = "  ".repeat(indent);
 
   // Split on {{ ... }}
