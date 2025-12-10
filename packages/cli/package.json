@@ -1,0 +1,15 @@
+{
+  "name": "static-block-kit",
+  "version": "0.0.1",
+  "type": "module",
+  "bin": {
+    "static-block-kit": "./src/cli.ts"
+  },
+  "files": ["src"],
+  "dependencies": {
+    "@static-block-kit/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

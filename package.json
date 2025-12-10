@@ -1,14 +1,23 @@
 {
-  "name": "static-kit-2",
-  "module": "index.ts",
+  "name": "static-block-kit",
+  "private": true,
   "type": "module",
-  "devDependencies": {
-    "@types/bun": "latest"
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run packages/cli/src/cli.ts dev",
+    "build": "bun run packages/cli/src/cli.ts build",
+    "gen": "bun run packages/cli/src/cli.ts gen",
+    "typecheck": "tsc --noEmit"
   },
-  "peerDependencies": {
+  "devDependencies": {
+    "@types/bun": "latest",
+    "bun-types": "^1.3.4",
     "typescript": "^5"
   },
   "dependencies": {
+    "@static-block-kit/core": "workspace:*",
     "parse5": "^8.0.0",
     "zod": "^4.1.13"
   }

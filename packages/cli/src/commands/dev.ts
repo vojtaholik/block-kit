@@ -1,0 +1,306 @@
+#!/usr/bin/env bun
+/**
+ * Static Kit - Development Server
+ *
+ * Bun.serve() based dev server with:
+ * - Page routes (rendered HTML with dev overlay)
+ * - Static asset serving
+ * - Dev API endpoints
+ * - Hot reload via SSE
+ */
+
+import { watch } from "node:fs";
+import { join } from "node:path";
+import {
+  decodeSchemaAddress,
+  blockRegistry,
+  renderPage,
+  compileBlockTemplates,
+  type PageConfig,
+} from "@static-block-kit/core";
+import { loadConfig, resolvePath } from "../config-loader.ts";
+
+const cwd = process.cwd();
+const config = await loadConfig(cwd);
+
+const blocksDir = resolvePath(config, "blocksDir", cwd);
+const pagesDir = resolvePath(config, "pagesDir", cwd);
+const assetsDir = resolvePath(config, "assetsDir", cwd);
+const publicDir = resolvePath(config, "publicDir", cwd);
+
+// Compile block templates before importing blocks (gen/ may not exist yet)
+console.log("🔨 Compiling block templates...");
+await compileBlockTemplates({
+  blocksDir,
+  genDir: join(blocksDir, "gen"),
+});
+
+// Dynamically import site's blocks and pages
+const blocksModule = await import(join(blocksDir, "index.ts"));
+const pagesModule = await import(join(pagesDir, "index.ts"));
+
+// Register all blocks at startup
+if (typeof blocksModule.registerAllBlocks === "function") {
+  blocksModule.registerAllBlocks();
+}
+
+const pages: PageConfig[] = pagesModule.pages;
+const getPageByPath = pagesModule.getPageByPath as (path: string) => PageConfig | undefined;
+
+// Try to load cms-blocks if it exists
+let cmsBlocks: Record<string, unknown> = {};
+try {
+  const cmsBlocksModule = await import(join(cwd, "src/cms-blocks.ts"));
+  cmsBlocks = cmsBlocksModule.cmsBlocks ?? cmsBlocksModule.default ?? {};
+} catch {
+  // No cms-blocks file, that's fine
+}
+
+const PORT = config.devPort;
+
+// Server start time for HMR restart detection
+const SERVER_START_TIME = Date.now();
+
+// SSE clients for hot reload
+const sseClients = new Set<ReadableStreamDefaultController<Uint8Array>>();
+
+// Debounce file change notifications
+let reloadTimeout: ReturnType<typeof setTimeout> | null = null;
+let lastChangeType: "full" | "css" = "full";
+
+function broadcastReload(type: "full" | "css" = "full") {
+  // Debounce rapid changes
+  if (reloadTimeout) {
+    clearTimeout(reloadTimeout);
+    // Escalate to full reload if mixed changes
+    if (type === "full") lastChangeType = "full";
+  } else {
+    lastChangeType = type;
+  }
+
+  reloadTimeout = setTimeout(() => {
+    reloadTimeout = null;
+    const message = `data: ${JSON.stringify({
+      type: lastChangeType,
+      time: Date.now(),
+    })}\n\n`;
+    const encoder = new TextEncoder();
+    const data = encoder.encode(message);
+
+    for (const controller of sseClients) {
+      try {
+        controller.enqueue(data);
+      } catch {
+        sseClients.delete(controller);
+      }
+    }
+    console.log(
+      `🔄 ${lastChangeType === "css" ? "CSS" : "Full"} reload triggered`
+    );
+  }, 50);
+}
+
+// Watch for file changes
+const watchDirs = [blocksDir, pagesDir, assetsDir];
+
+for (const dir of watchDirs) {
+  try {
+    watch(dir, { recursive: true }, (event, filename) => {
+      if (!filename) return;
+
+      // Ignore generated files and non-source files
+      if (filename.includes("/gen/") || filename.endsWith(".render.ts")) return;
+
+      // Determine reload type
+      if (filename.endsWith(".css")) {
+        broadcastReload("css");
+      } else if (
+        filename.endsWith(".ts") ||
+        filename.endsWith(".html") ||
+        filename.endsWith(".js")
+      ) {
+        broadcastReload("full");
+      }
+    });
+  } catch {
+    // Directory might not exist yet
+  }
+}
+
+console.log(`🚀 Starting dev server on http://localhost:${PORT}`);
+console.log(`👀 Watching for changes...`);
+
+Bun.serve({
+  port: PORT,
+  async fetch(req) {
+    const url = new URL(req.url);
+    const path = url.pathname;
+
+    try {
+      // Static assets
+      if (path === "/styles.css") {
+        const css = await Bun.file(join(assetsDir, "styles.css")).text();
+        return new Response(css, {
+          headers: { "Content-Type": "text/css" },
+        });
+      }
+
+      if (path === "/app.js") {
+        const js = await Bun.file(join(assetsDir, "client/app.js")).text();
+        return new Response(js, {
+          headers: { "Content-Type": "application/javascript" },
+        });
+      }
+
+      if (path === "/__dev-overlay.js") {
+        const js = await Bun.file(join(assetsDir, "client/dev-overlay.js")).text();
+        return new Response(js, {
+          headers: { "Content-Type": "application/javascript" },
+        });
+      }
+
+      // Hot reload SSE endpoint
+      if (path === "/__hmr") {
+        const stream = new ReadableStream<Uint8Array>({
+          start(controller) {
+            sseClients.add(controller);
+            // Send initial connected message with server start time
+            const encoder = new TextEncoder();
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({
+                  type: "connected",
+                  time: SERVER_START_TIME,
+                })}\n\n`
+              )
+            );
+          },
+          cancel(controller) {
+            sseClients.delete(controller);
+          },
+        });
+
+        return new Response(stream, {
+          headers: {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            Connection: "keep-alive",
+          },
+        });
+      }
+
+      // Dev API endpoints
+      if (path === "/__pages") {
+        return Response.json(
+          pages.map((p) => ({
+            id: p.id,
+            path: p.path,
+            title: p.title,
+          }))
+        );
+      }
+
+      if (path === "/__site") {
+        return Response.json({
+          pages: pages.map((p) => ({
+            id: p.id,
+            path: p.path,
+            title: p.title,
+          })),
+          blocks: blockRegistry.types(),
+          schemas: cmsBlocks,
+        });
+      }
+
+      if (path === "/__inspect") {
+        const address = url.searchParams.get("address");
+        if (!address) {
+          return Response.json(
+            { error: "Missing address parameter" },
+            { status: 400 }
+          );
+        }
+
+        try {
+          const decoded = decodeSchemaAddress(address);
+          const page = pages.find((p) => p.id === decoded.pageId);
+          const region = page?.regions[decoded.region];
+          const block = region?.blocks.find((b) => b.id === decoded.blockId);
+
+          return Response.json({
+            address: decoded,
+            page: page
+              ? { id: page.id, path: page.path, title: page.title }
+              : null,
+            block: block
+              ? { id: block.id, type: block.type, props: block.props }
+              : null,
+            schema: block ? cmsBlocks[block.type] : null,
+          });
+        } catch (err) {
+          return Response.json(
+            { error: "Invalid address", details: String(err) },
+            { status: 400 }
+          );
+        }
+      }
+
+      // Public static files
+      if (path.startsWith("/public/")) {
+        const filePath = join(publicDir, path.slice(8)); // Remove /public/
+        const file = Bun.file(filePath);
+        if (await file.exists()) {
+          return new Response(file);
+        }
+      }
+
+      // Page routes
+      const pagePath = path === "/" ? "/" : path.replace(/\/$/, "");
+      const page = getPageByPath(pagePath);
+
+      if (page) {
+        const html = await renderPage(page, {
+          templateDir: pagesDir,
+          isDev: true,
+          assetBase: "/",
+        });
+
+        return new Response(html, {
+          headers: { "Content-Type": "text/html" },
+        });
+      }
+
+      // 404
+      return new Response("Not Found", { status: 404 });
+    } catch (err) {
+      console.error("Error handling request:", err);
+      return new Response(
+        `<html>
+          <head><title>Error</title></head>
+          <body style="font-family: system-ui; padding: 2rem;">
+            <h1>Server Error</h1>
+            <pre style="background: #f5f5f5; padding: 1rem; overflow: auto;">${String(
+              err
+            )}</pre>
+          </body>
+        </html>`,
+        {
+          status: 500,
+          headers: { "Content-Type": "text/html" },
+        }
+      );
+    }
+  },
+});
+
+console.log(`
+  Dev server running at http://localhost:${PORT}
+
+  Routes configured from ${pagesDir}
+  Assets served from ${assetsDir}
+
+  Dev API:
+    /__pages    → List all pages
+    /__site     → Site config (pages, blocks, schemas)
+    /__inspect  → Decode schema address
+`);
