@@ -217,66 +217,65 @@ export const indexPage: PageConfig = {
           },
         },
         {
-          id: "features-1",
-          type: "featureGrid",
+          id: "business-card-1",
+          type: "businessCard",
           props: {
-            headline: "Why Static Kit?",
-            subheadline:
-              "Everything you need to build fast, maintainable static sites.",
-            columns: "3",
-            features: [
+            headline: "Rádi vám s výběrem pomůžeme",
+            body: "Naše řešení najdete v domku mladé rodiny, ale i v realizacích zvučných architektů, nebo třeba u dubajských šejků.",
+            primaryCta: {
+              href: "/poptavka",
+              label: "Poslat poptávku",
+            },
+            contactLinks: [
               {
-                icon: "⚡",
-                title: "Lightning Fast",
-                description:
-                  "Pre-rendered HTML with zero JavaScript by default. Your pages load instantly.",
+                href: "mailto:ales.vyskocil@japcz.cz",
+                label: "ales.vyskocil@japcz.cz",
               },
               {
-                icon: "🧱",
-                title: "Block-Based",
-                description:
-                  "Compose pages from reusable blocks with type-safe props and CMS-ready schemas.",
-              },
-              {
-                icon: "🎨",
-                title: "Design System Ready",
-                description:
-                  "Built-in layout primitives and design tokens. Customize everything with CSS.",
-              },
-              {
-                icon: "📝",
-                title: "CMS Compatible",
-                description:
-                  "Export your content schemas for use with any headless CMS.",
-              },
-              {
-                icon: "🔧",
-                title: "Developer Experience",
-                description:
-                  "Hot reload, TypeScript everywhere, and a simple mental model.",
-              },
-              {
-                icon: "🚀",
-                title: "Deploy Anywhere",
-                description:
-                  "Output is plain HTML/CSS/JS. Deploy to any static host.",
+                href: "tel:+420724996673",
+                label: "+420 724 996 673",
               },
             ],
+            contactPerson: {
+              name: "Aleš Vyskočil",
+              title: "Obchodně-technický poradce",
+              regions:
+                "Moravskoslezský kraj, Olomoucký kraj, Zlínský kraj (Vsetín)",
+              image: {
+                src: "public/images/ales-vyskocil.jpg",
+                alt: "Aleš Vyskočil",
+              },
+            },
           },
         },
         {
           id: "cta-1",
           type: "sectionHeader",
           props: {
-            headline: "Jednokřídlá stavební pouzdra",
-            body: "<p>Jednokřídlá stavební pouzdra jsou ideální pro domácnosti a malé firmy. Mají velkou vnitřní plochu a jsou velmi odolné.</p>",
+            headline: "Vlastnosti dané kategorie",
+            body: "<p>Rychlé rozložení i složení žebříku a jednoduchá manipulace zajišťují komfortní používání. Dbáme na kvalitu použitých materiálů a důmyslné zpracování, proto se půdní schody JAP vyznačují dlouhou životností a vysokou odolností.</p>",
             image: {
-              src: "public/images/section-header.jpg",
-              alt: "Section Header Image",
+              src: "public/images/1.jpg",
+              alt: "Section Image",
             },
           },
           layout: {
-            contentAlign: "left",
+            contentAlign: "split-start",
+          },
+        },
+        {
+          id: "cta-1",
+          type: "sectionHeader",
+          props: {
+            headline: "Vlastnosti dané kategorie",
+            body: "<p>Rychlé rozložení i složení žebříku a jednoduchá manipulace zajišťují komfortní používání. Dbáme na kvalitu použitých materiálů a důmyslné zpracování, proto se půdní schody JAP vyznačují dlouhou životností a vysokou odolností.</p>",
+            image: {
+              src: "public/images/2.jpg",
+              alt: "Section Image",
+            },
+          },
+          layout: {
+            contentAlign: "split-end",
           },
         },
       ],

@@ -21,6 +21,11 @@ export {
   teaserPropsSchema,
   type TeaserProps,
 } from "./teaser.block.ts";
+export {
+  businessCardBlock,
+  businessCardPropsSchema,
+  type BusinessCardProps,
+} from "./business-card.block.ts";
 
 // Register all blocks
 import { blockRegistry } from "@static-block-kit/core";
@@ -30,6 +35,7 @@ import { latestPostsBlock } from "./latest-posts.block.ts";
 import { sectionHeaderBlock } from "./section-header.block.ts";
 import { gridBlock } from "./grid.block.ts";
 import { teaserBlock } from "./teaser.block.ts";
+import { businessCardBlock } from "./business-card.block.ts";
 
 export function registerAllBlocks() {
   blockRegistry.register(heroBlock);
@@ -38,4 +44,5 @@ export function registerAllBlocks() {
   blockRegistry.register(sectionHeaderBlock);
   blockRegistry.register(gridBlock);
   blockRegistry.register(teaserBlock);
+  blockRegistry.register(businessCardBlock);
 }

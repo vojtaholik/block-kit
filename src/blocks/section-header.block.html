@@ -1,16 +1,18 @@
 <section
-  class="section section--{{ ctx.layout.contentAlign }}"
+  class="section section--{{ ctx.layout.contentAlign }} section--tone-{{ ctx.layout.tone }}"
   data-block-id="{{ addr.blockId }}"
   data-schema-address="{{ encodeSchemaAddress(addr) }}"
 >
   <div class="container container--wide">
-    <div class="section-header">
-      <template v-if="props.headline">
-        <h2 class="h2">{{ props.headline }}</h2>
-      </template>
-      <div class="prose" v-if="props.body">{{{ props.body }}}</div>
+    <div class="section-header section-header--{{ ctx.layout.contentAlign }}">
+      <div class="section-header__content">
+        <template v-if="props.headline">
+          <h2 class="h2">{{ props.headline }}</h2>
+        </template>
+        <div class="prose" v-if="props.body">{{{ props.body }}}</div>
+      </div>
       <template v-if="props.image">
-        <div class="text-section__cta">
+        <div class="section-header__image">
           <img
             :src="props.image.src"
             :alt="props.image.alt"
