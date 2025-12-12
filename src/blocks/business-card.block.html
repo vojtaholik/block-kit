@@ -1,0 +1,58 @@
+<section
+  class="section section--tone-{{ ctx.layout.tone }}"
+  data-block-id="{{ addr.blockId }}"
+  data-schema-address="{{ encodeSchemaAddress(addr) }}"
+>
+  <div class="container container--wide">
+    <div class="business-card">
+      <template v-if="props.contactPerson?.image">
+        <div class="business-card__image">
+          <img
+            :src="props.contactPerson.image.src"
+            :alt="props.contactPerson.image.alt"
+            loading="lazy"
+          />
+          <div class="business-card__image-overlay"></div>
+        </div>
+      </template>
+      <div class="business-card__container">
+        <div class="business-card__content">
+          <div class="business-card__text">
+            <h2 class="business-card__headline">{{ props.headline }}</h2>
+            <p v-if="props.body" class="business-card__body">
+              {{ props.body }}
+            </p>
+          </div>
+          <div class="business-card__footer">
+            <div class="business-card__actions">
+              <a class="btn btn--gold" :href="props.primaryCta.href">
+                {{ props.primaryCta.label }}
+              </a>
+              <template v-for="link in props.contactLinks">
+                <a class="btn btn--outline-light" :href="link.href">
+                  {{ link.label }}
+                </a>
+              </template>
+            </div>
+            <template v-if="props.contactPerson">
+              <div class="business-card__contact">
+                <p class="business-card__contact-name">
+                  {{ props.contactPerson.name }}
+                </p>
+                <p class="business-card__contact-title">
+                  {{ props.contactPerson.title }}
+                </p>
+                <p
+                  v-if="props.contactPerson.regions"
+                  class="business-card__contact-regions"
+                >
+                  {{ props.contactPerson.regions }}
+                </p>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -82,6 +82,10 @@ const SERVER_START_TIME = Date.now();
 
 // SSE clients for hot reload
 const sseClients = new Set<ReadableStreamDefaultController<Uint8Array>>();
+const sseHeartbeats = new Map<
+  ReadableStreamDefaultController<Uint8Array>,
+  ReturnType<typeof setInterval>
+>();
 
 // Debounce file change notifications
 let reloadTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -110,6 +114,12 @@ function broadcastReload(type: "full" | "css" = "full") {
       try {
         controller.enqueue(data);
       } catch {
+        // Clean up both client and heartbeat when controller fails
+        const heartbeat = sseHeartbeats.get(controller);
+        if (heartbeat) {
+          clearInterval(heartbeat);
+          sseHeartbeats.delete(controller);
+        }
         sseClients.delete(controller);
       }
     }
@@ -177,6 +187,7 @@ console.log(`👀 Watching for changes...`);
 
 Bun.serve({
   port: PORT,
+  idleTimeout: 120, // Don't kill SSE connections every 10s
   async fetch(req) {
     const url = new URL(req.url);
     const path = url.pathname;
@@ -195,8 +206,8 @@ Bun.serve({
         const stream = new ReadableStream<Uint8Array>({
           start(controller) {
             sseClients.add(controller);
-            // Send initial connected message with server start time
             const encoder = new TextEncoder();
+            // Send initial connected message with server start time
             controller.enqueue(
               encoder.encode(
                 `data: ${JSON.stringify({
@@ -205,8 +216,23 @@ Bun.serve({
                 })}\n\n`
               )
             );
+            // Heartbeat every 30s to keep connection alive
+            const heartbeat = setInterval(() => {
+              try {
+                controller.enqueue(encoder.encode(": heartbeat\n\n"));
+              } catch {
+                clearInterval(heartbeat);
+                sseHeartbeats.delete(controller);
+              }
+            }, 30000);
+            sseHeartbeats.set(controller, heartbeat);
           },
           cancel(controller) {
+            const heartbeat = sseHeartbeats.get(controller);
+            if (heartbeat) {
+              clearInterval(heartbeat);
+              sseHeartbeats.delete(controller);
+            }
             sseClients.delete(controller);
           },
         });

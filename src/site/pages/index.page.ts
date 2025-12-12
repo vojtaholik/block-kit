@@ -1,7 +1,7 @@
 import type { PageConfig } from "@static-block-kit/core";
 
 export const indexPage: PageConfig = {
-  id: "home",
+  id: "index",
   path: "/",
   title: "JAP",
   template: "base.html",
@@ -13,17 +13,24 @@ export const indexPage: PageConfig = {
           id: "hero-1",
           type: "hero",
           props: {
-            eyebrow: "Introducing Static Kit",
-            headline: "Build Beautiful Static Sites",
-            subheadline:
-              "A modern static site generator with block-based content management and a Vue-like template DSL.",
-            primaryCta: {
-              href: "/docs/getting-started",
-              label: "Get Started",
-            },
-            secondaryCta: {
-              href: "/about",
-              label: "Learn More",
+            title: "Jednokřídlá stavební pouzdra",
+            links: [
+              {
+                href: "/poptavka",
+                label: "Nezávazně poptejte",
+              },
+              {
+                href: "/showroom",
+                label: "Navštivte showrooom",
+              },
+              {
+                href: "/prodejce",
+                label: "Najděte prodejce",
+              },
+            ],
+            backgroundImage: {
+              src: "public/images/hero.jpg",
+              alt: "Hero Background",
             },
           },
           layout: {
@@ -33,72 +40,242 @@ export const indexPage: PageConfig = {
           },
         },
         {
-          id: "features-1",
-          type: "featureGrid",
+          id: "section-header-1",
+          type: "sectionHeader",
           props: {
-            headline: "Why Static Kit?",
-            subheadline:
-              "Everything you need to build fast, maintainable static sites.",
-            columns: "3",
-            features: [
+            headline: "Elegantní řešení",
+            body: "<p>Jednokřídlé stavební pouzdro uplatníte při nové výstavbě či rekonstrukci. Je vhodné do obývacího pokoje, ložnice, kuchyně, komory, šatny, koupelny, toalety nebo pracovny.</p>",
+          },
+          layout: {
+            contentAlign: "left",
+          },
+        },
+        {
+          id: "grid-1",
+          type: "grid",
+          props: {
+            itemBlock: "teaser",
+            columns: "5",
+            items: [
               {
-                icon: "⚡",
-                title: "Lightning Fast",
-                description:
-                  "Pre-rendered HTML with zero JavaScript by default. Your pages load instantly.",
+                title: "Stavební pouzdra",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser1.jpg",
+                  alt: "Stavební pouzdra",
+                },
+                link: {
+                  href: "/stavebni-pouzdra",
+                  label: "Stavební pouzdra",
+                },
               },
               {
-                icon: "🧱",
-                title: "Block-Based",
-                description:
-                  "Compose pages from reusable blocks with type-safe props and CMS-ready schemas.",
+                title: "Půdní schody",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser2.jpg",
+                  alt: "Půdní schody",
+                },
+                link: {
+                  href: "/pudni-schody",
+                  label: "Půdní schody",
+                },
               },
               {
-                icon: "🎨",
-                title: "Design System Ready",
-                description:
-                  "Built-in layout primitives and design tokens. Customize everything with CSS.",
+                title: "Zárubně",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser3.jpg",
+                  alt: "Zárubně",
+                },
+                link: {
+                  href: "/zarubne",
+                  label: "Zárubně",
+                },
               },
               {
-                icon: "📝",
-                title: "CMS Compatible",
-                description:
-                  "Export your content schemas for use with any headless CMS.",
+                title: "Dveře",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser4.jpg",
+                  alt: "Dveře",
+                },
+                link: {
+                  href: "/dvere",
+                  label: "Dveře",
+                },
               },
               {
-                icon: "🔧",
-                title: "Developer Experience",
-                description:
-                  "Hot reload, TypeScript everywhere, and a simple mental model.",
+                title: "Posuvy",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser5.jpg",
+                  alt: "Posuvy",
+                },
+                link: {
+                  href: "/posuvy",
+                  label: "Posuvy",
+                },
               },
               {
-                icon: "🚀",
-                title: "Deploy Anywhere",
-                description:
-                  "Output is plain HTML/CSS/JS. Deploy to any static host.",
+                title: "Skleněné stěny",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser6.jpg",
+                  alt: "Skleněné stěny",
+                },
+                link: {
+                  href: "/sklenene-steny",
+                  label: "Skleněné stěny",
+                },
+              },
+              {
+                title: "Grafosklo",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser7.jpg",
+                  alt: "Grafosklo",
+                },
+                link: {
+                  href: "/grafosklo",
+                  label: "Grafosklo",
+                },
+              },
+              {
+                title: "Obkladové systémy",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser8.jpg",
+                  alt: "Obkladové systémy",
+                },
+                link: {
+                  href: "/obkladove-systemy",
+                  label: "Obkladové systémy",
+                },
+              },
+              {
+                title: "Schodiště",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser9.jpg",
+                  alt: "Schodiště",
+                },
+                link: {
+                  href: "/schodiste",
+                  label: "Schodiště",
+                },
+              },
+              {
+                title: "Soklové lišty",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser10.jpg",
+                  alt: "Soklové lišty",
+                },
+                link: {
+                  href: "/soklove-listy",
+                  label: "Soklové lišty",
+                },
+              },
+              {
+                title: "Zábradlí",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser11.jpg",
+                  alt: "Zábradlí",
+                },
+                link: {
+                  href: "/zabradli",
+                  label: "Zábradlí",
+                },
+              },
+              {
+                title: "Stříšky",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser12.jpg",
+                  alt: "Stříšky",
+                },
+                link: {
+                  href: "/strisky",
+                  label: "Stříšky",
+                },
+              },
+              {
+                title: "Vchodový systém",
+                subtitle: "Lorem ipsum",
+                image: {
+                  src: "public/images/teaser1.jpg",
+                  alt: "Vchodový systém",
+                },
+                link: {
+                  href: "/vchodovy-system",
+                  label: "Vchodový systém",
+                },
               },
             ],
           },
-          layout: {
-            tone: "surface",
-            contentAlign: "center",
+        },
+        {
+          id: "business-card-1",
+          type: "businessCard",
+          props: {
+            headline: "Rádi vám s výběrem pomůžeme",
+            body: "Naše řešení najdete v domku mladé rodiny, ale i v realizacích zvučných architektů, nebo třeba u dubajských šejků.",
+            primaryCta: {
+              href: "/poptavka",
+              label: "Poslat poptávku",
+            },
+            contactLinks: [
+              {
+                href: "mailto:ales.vyskocil@japcz.cz",
+                label: "ales.vyskocil@japcz.cz",
+              },
+              {
+                href: "tel:+420724996673",
+                label: "+420 724 996 673",
+              },
+            ],
+            contactPerson: {
+              name: "Aleš Vyskočil",
+              title: "Obchodně-technický poradce",
+              regions:
+                "Moravskoslezský kraj, Olomoucký kraj, Zlínský kraj (Vsetín)",
+              image: {
+                src: "public/images/ales-vyskocil.jpg",
+                alt: "Aleš Vyskočil",
+              },
+            },
           },
         },
         {
           id: "cta-1",
-          type: "textSection",
+          type: "sectionHeader",
           props: {
-            headline: "Ready to build?",
-            body: "<p>Get started with Static Kit in minutes. Install the CLI, create a new project, and start building beautiful static sites.</p>",
-            cta: {
-              href: "/docs/getting-started",
-              label: "Read the Docs",
+            headline: "Vlastnosti dané kategorie",
+            body: "<p>Rychlé rozložení i složení žebříku a jednoduchá manipulace zajišťují komfortní používání. Dbáme na kvalitu použitých materiálů a důmyslné zpracování, proto se půdní schody JAP vyznačují dlouhou životností a vysokou odolností.</p>",
+            image: {
+              src: "public/images/1.jpg",
+              alt: "Section Image",
             },
           },
           layout: {
-            tone: "raised",
-            contentAlign: "center",
-            contentWidth: "narrow",
+            contentAlign: "split-start",
+          },
+        },
+        {
+          id: "cta-1",
+          type: "sectionHeader",
+          props: {
+            headline: "Vlastnosti dané kategorie",
+            body: "<p>Rychlé rozložení i složení žebříku a jednoduchá manipulace zajišťují komfortní používání. Dbáme na kvalitu použitých materiálů a důmyslné zpracování, proto se půdní schody JAP vyznačují dlouhou životností a vysokou odolností.</p>",
+            image: {
+              src: "public/images/2.jpg",
+              alt: "Section Image",
+            },
+          },
+          layout: {
+            contentAlign: "split-end",
           },
         },
       ],
